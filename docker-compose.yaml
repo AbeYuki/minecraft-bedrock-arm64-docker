@@ -1,0 +1,13 @@
+version: "3.9"
+services:
+  bedrock:
+    image: abeyuki/minecraft-bedrock-arm64
+    ports:
+      - 19132:19132/udp
+    stdin_open: true
+    tty: true
+    command: bash -c "box64 /bedrock-server/bedrock_server"
+    volumes:
+      - bedrock_data:/bedrock-server
+volumes:
+  bedrock_data:
