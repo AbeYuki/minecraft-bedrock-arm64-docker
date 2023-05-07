@@ -1,0 +1,15 @@
+FROM ubuntu
+RUN apt-get update && apt-get upgrade \
+    apt-get install -y \
+        curl \
+        gnupg \
+        wget \
+        zip \
+        unzip \
+        cmake \
+        make \
+        git 
+RUN git clone https://github.com/ptitSeb/box64 \
+    bash -c "cd box64;mkdir build; cd build; cmake .. -DRK3399=1 -DCMAKE_BUILD_TYPE=RelWithDebInfo;make -j4;make install"
+RUN curl -O https://minecraft.azureedge.net/bin-linux/bedrock-server-1.19.81.01.zip \
+    && unzip bedrock-server-1.19.81.01.zip -d bedrock-server-1.19.81.01

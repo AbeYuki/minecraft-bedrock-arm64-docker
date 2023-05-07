@@ -1,0 +1,20 @@
+version: "3.9"
+services:
+  bedrock:
+    container_name: bedrock_server_1.19.81.01
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - 19132:19132/udp
+    stdin_open: true
+    tty: true
+    environment:
+      EULA: "TRUE"
+      GAMEMODE: survival
+      DIFFICULTY: normal
+    command: bash -c "box64 /bedrock-server/bedrock_server"
+    volumes:
+      - bedrock_data:/bedrock-server
+volumes:
+  bedrock_data:
