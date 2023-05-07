@@ -1,15 +1,19 @@
 FROM ubuntu
-RUN apt-get update && apt-get upgrade \
-    apt-get install -y \
-        curl \
-        gnupg \
-        wget \
-        zip \
-        unzip \
-        cmake \
-        make \
-        git 
-RUN git clone https://github.com/ptitSeb/box64 \
-    bash -c "cd box64;mkdir build; cd build; cmake .. -DRK3399=1 -DCMAKE_BUILD_TYPE=RelWithDebInfo;make -j4;make install"
-RUN curl -O https://minecraft.azureedge.net/bin-linux/bedrock-server-1.19.81.01.zip \
-    && unzip bedrock-server-1.19.81.01.zip -d bedrock-server-1.19.81.01
+ENV BOX_VERSION=v0.2.2
+ENV BEDROCK_SERVER_VERSION=1.19.81.01
+RUN apt-get update && apt upgrade -y && \
+    apt-get -qq install -y \
+    software-properties-common \
+    ca-certificates \
+    curl \
+    gnupg \
+    wget \
+    zip \
+    unzip \
+    cmake \
+    make \
+    git
+RUN git clone -b ${BOX_VERSION} https://github.com/ptitSeb/box64
+RUN /bin/bash -c 'cd box64;mkdir build; cd build; cmake .. -DRK3399=1 -DCMAKE_BUILD_TYPE=RelWithDebInfo;make -j4;make install'
+RUN curl -O https://minecraft.azureedge.net/bin-linux/bedrock-server-${BEDROCK_SERVER_VERSION}.zip \
+    && unzip bedrock-server-${BEDROCK_SERVER_VERSION}.zip -d bedrock-server
