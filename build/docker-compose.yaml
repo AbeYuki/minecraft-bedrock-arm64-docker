@@ -1,7 +1,10 @@
 version: "3.9"
 services:
   bedrock:
-    image: abeyuki/minecraft-bedrock-arm64:1.19.81.01
+    container_name: bedrock_server_1.19.81.01
+    build:
+      context: .
+      dockerfile: ./Dockerfile
     ports:
       - 19132:19132/udp
     stdin_open: true
@@ -10,7 +13,7 @@ services:
       EULA: "TRUE"
       GAMEMODE: survival
       DIFFICULTY: normal
-    command: bash -c 'cd bedrock-server/; box64 bedrock_server'
+    command: bash -c "box64 /bedrock-server/bedrock_server"
     volumes:
       - bedrock_data:/bedrock-server
 volumes:
