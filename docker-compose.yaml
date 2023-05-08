@@ -10,7 +10,6 @@ services:
       EULA: "TRUE"
       GAMEMODE: survival
       DIFFICULTY: normal
-    command: bash -c 'cd bedrock-server/; box64 bedrock_server'
     volumes:
       - bedrock_data:/bedrock-server
 volumes:
