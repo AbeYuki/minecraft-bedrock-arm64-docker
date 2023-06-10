@@ -1,0 +1,109 @@
+version: 2.1
+orbs: 
+  kubernetes: circleci/kubernetes@1.3.0
+
+workflows:
+  build:
+    jobs:
+      - create-update:
+          context: kaniko
+          filters:
+            branches:
+              only: 
+                - build
+      - status-pod:
+          context: kaniko
+          requires:
+            - create-update
+          filters:
+            branches:
+              only: 
+                - build
+      - delete:
+          context: kaniko
+          requires:
+            - status-pod
+          filters:
+            branches:
+              only: 
+                - build
+  
+executors:
+  default:
+    docker:
+      - image: 'cimg/base:current-22.04'
+commands:
+  setup_kubectl:
+    steps:
+      - run:
+          name: "kubectl install"
+          command: |
+              curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.24.0/bin/linux/arm64/kubectl
+              chmod +x ./kubectl
+              sudo mv ./kubectl /usr/local/bin/kubectl
+              kubectl version --client
+  setup_kubeconfig:
+    steps:
+      - run:
+          name: "kubeconfig"
+          command: |
+              mkdir -p ~/.kube/
+              echo -n "${KUBECONFIG_DATA}" | base64 -d > ~/.kube/config
+              kubectl config use-context ${CONTEXT_NAME}
+  
+  setup_repository:
+    steps:
+      - run:
+          name: "setup repositry"
+          command: |
+            git clone https://"{GITHUB_USER}":"{GITHUB_PASSWORD}"@github.com/AbeYuki/kaniko.git
+
+jobs:
+  create-update:
+    resource_class: abeyuki/circleci
+    executor:
+      name: default
+    steps:
+      - checkout
+      - setup_kubectl
+      - setup_kubeconfig
+      - setup_repository
+      - kubernetes/create-or-update-resource:
+          kustomize: true
+          resource-file-path: kaniko/overlay/minecraft-bedrock-arm64-docker
+          show-kubectl-command: true
+
+  status-pod:
+    resource_class: abeyuki/circleci
+    executor:
+      name: default
+    steps:
+      - checkout
+      - setup_kubectl
+      - setup_kubeconfig
+      - run:
+          name: "status check"
+          command: |
+            ns=kaniko
+            count=1
+            while true ;do 
+                if [[ $(kubectl get pods -n $ns --field-selector=status.phase=Succeeded | awk 'NR>1 {print$3}' | wc -l) -ge ${count} ]] ;then 
+                    echo "pod status OK" ; sleep 3 ; break 
+                else echo "pod status NG" ; sleep 3
+                fi
+            done
+
+  delete:
+    resource_class: abeyuki/circleci
+    executor:
+      name: default
+    steps:
+      - checkout
+      - setup_kubectl
+      - setup_kubeconfig
+      - setup_repository
+      - kubernetes/delete-resource:
+          kustomize: true
+          now: true
+          resource-file-path: kaniko/overlay/minecraft-bedrock-arm64-docker
+          wait: true
