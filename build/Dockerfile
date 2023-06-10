@@ -1,6 +1,6 @@
 FROM ubuntu
 ENV BOX_VERSION=v0.2.2
-ENV BEDROCK_SERVER_VERSION=1.19.81.01
+ENV BEDROCK_SERVER_VERSION=1.20.0.01
 RUN apt-get update && apt upgrade -y && \
     apt-get -qq install -y \
     software-properties-common \
