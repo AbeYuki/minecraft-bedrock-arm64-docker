@@ -56,7 +56,7 @@ commands:
       - run:
           name: "setup repositry"
           command: |
-            git clone https://"{GITHUB_USER}":"{GITHUB_PASSWORD}"@github.com/AbeYuki/kaniko.git
+            git clone https://"${GITHUB_USER}":"${GITHUB_PASSWORD}"@github.com/AbeYuki/kaniko.git
 
 jobs:
   create-update:
